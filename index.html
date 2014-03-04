@@ -4,13 +4,29 @@
 <head>
     <meta charset="utf-8" />
     <title></title>
+    <link href="style.css" rel="stylesheet" />
+    <link href="jquery.nouislider.min.css" rel="stylesheet" />
     <script src="jquery.min_19.js"></script>
+    <script src="jquery.nouislider.min.js"> </script>
     <script src="drawrec.js"></script>
 </head>
 <body>
     <canvas id="theCanvas" width="800" height="400" style="border:1px solid black">
         Browser does not support canvas!
     </canvas>
-    <button>REPLAY</button>
+    
+    <div id="menu">
+        <div id="brushSize">
+            <label> Brush Size: </label>
+            
+            <span id="brushSizeSpan">000</span> 
+            <div id="slider"></div>
+            <!--<div id="brushSizePlus" class="button">+</div>
+            <div id="brushSizeMinus" class="button">-</div>-->
+        </div>
+        <div id="replayBut" class="button">REPLAY</div>
+        <div id="resetBut" class="button">RESET</div>
+        
+    </div>
 </body>
 </html>

@@ -1,0 +1,74 @@
+* {
+    border:0;
+    margin:0;
+    padding:0;
+    display:block;
+    font-family:sans-serif;
+    font-size:10pt;
+}
+
+#theCanvas {
+    width:800px;
+    height:400px;
+    margin:0 auto;
+}
+
+#menu {
+    width:200px;
+    margin:5px auto;
+    background-color:#0094ff;
+    padding:15px 10px 10px 10px;
+    color:white;
+}
+
+#brushSize {
+    height:38px;
+    margin-bottom:20px;
+}
+
+    #brushSize > * {
+        float:left;
+        margin:0 2px;
+        cursor:default;
+    }
+
+    #brushSize > label {
+        width:84px;
+    }
+
+    #brushSize > span {
+        width:40px;
+    }
+
+    .button {
+        text-align:center;
+        background-color:#007fdb;
+        display:table-cell;
+        padding:0 5px;
+        line-height:14pt;
+        cursor:default;
+        min-width:18px;
+
+        -webkit-user-select: none; /* Chrome/Safari */        
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE10+ */
+
+        /* Rules below not implemented in browsers yet */
+        -o-user-select: none;
+        user-select: none;
+    }
+
+        .button:hover {
+            background-color:#3aacff;
+        }
+
+#replayBut, #resetBut {
+    margin:0 auto;
+    display:block;
+    margin-bottom:8px;
+}
+
+#slider {
+    width:80%;
+    margin:10px 10px 10px 20px;
+}
