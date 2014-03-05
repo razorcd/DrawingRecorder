@@ -2,16 +2,17 @@ $(function () {
     
     var theCanvas = $("#theCanvas");
     var ctx = theCanvas[0].getContext("2d");
+    //ctx.imageSmoothingEnabled = true;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
-
 
     var mouse = { x: 0, y: 0 , details: "" };
     var recordArray = [], i=0;
     var interval;
 
-    var brushSize = 10;
+    var brushSize = 10;   //initial size of the brush
     var tempDetails = "";
+    var recordingInterval = 10;   //recording/playing interval - miliseconds
 
     $("#brushSizeSpan")[0].innerHTML = brushSize;
     
@@ -42,13 +43,15 @@ $(function () {
             tempDetails += "b" + ("00" + brushSize).substr(-2);
             record(true, tempDetails);
             beginDraw();
-            draw();
+            //draw();
 
             $("body").bind("mousemove", function (event) {
                 event.preventDefault();
                 readMouseXY(event);
-                record(true);
-                draw();
+                interval = setTimeout(function () {
+                    record(true);
+                    draw();
+                }, recordingInterval);
             });
 
 
@@ -56,31 +59,40 @@ $(function () {
                 record(false);
                 $("body").unbind("mousemove");
                 $("body").unbind("mouseup");
+                
             });
         });
         //mouse bindings end
+
     } else {
+        //touch bndings
         theCanvas[0].addEventListener('touchstart', function (event) {
+            event.preventDefault();
             readTouchXY(event);
             tempDetails += "n";
             tempDetails += "b" + ("00" + brushSize).substr(-2);
             record(true, tempDetails);
             beginDraw();
-            draw();
+            //draw();
 
             theCanvas[0].addEventListener('touchmove', function (event) {
+                event.preventDefault();
                 readTouchXY(event);
-                record(true);
-                draw();
+                nterval = setTimeout(function () {
+                    record(true);
+                    draw();
+                }, 10);
             }, false);
 
             theCanvas[0].addEventListener('touchend', function (event) {
+                event.preventDefault();
                 record(false);
                 theCanvas[0].removeEventListener('touchmove');
                 theCanvas[0].removeEventListener('touchend');
             }, false);
 
-        },false);
+        }, false);
+        //touch bindings end
     }
 
     //buttons binding
@@ -115,32 +127,23 @@ $(function () {
         ctx.moveTo(mouse.x, mouse.y);
         ctx.lineTo(mouse.x+0.01, mouse.y+0.01);
         ctx.lineWidth = brushSize;
-        //ctx.arc(mouse.x, mouse.y, 10, 0, 2 * Math.PI, false);
-        //ctx.fill();
+        ctx.stroke();
     }
 
     //drawing (used on mousemove)
     function draw() {
-        ctx.lineTo(mouse.x, mouse.y);
-        ctx.stroke();
+        //var xc, yc;
+          //  xc = (recordArray[i-1].x + mouse.x) / 2;
+            //yc = (recordArray[i-1].y + mouse.y) / 2;
+            ctx.lineTo(recordArray[i-1].x, recordArray[i-1].y);
+            //ctx.quadraticCurveTo(recordArray[i-1].x, recordArray[i-1].y, xc, yc);
+
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(recordArray[i - 1].x, recordArray[i - 1].y);
+            clearTimeout(interval);
     }
 
-
-
-    //recording the mousemove
-    function record(active) {
-        if (active) {
-            interval = setInterval(function () {
-                recordArray[i] = mouse.constructor();
-                recordArray[i].x = mouse.x;
-                recordArray[i].y = mouse.y;
-                console.log(recordArray[i].x + "  " + recordArray[i].y);
-                i++;
-            }, 10);
-        } else {
-            clearInterval(interval);
-        }
-    }
 
     //recording mousedown
     function record(active, newlineDetails) {
@@ -149,14 +152,14 @@ $(function () {
         recordArray[i].y = mouse.y;
         recordArray[i].details = newlineDetails;
         tempDetails = "";
-        console.log(recordArray[i].x + "  " + recordArray[i].y + "  " + recordArray[i].details);
+        console.log("REC" + recordArray[i].x + "  " + recordArray[i].y + "  " + recordArray[i].details);
         i++;
     }
 
     //replaying the recording
     function replay() {
         if (i === 0) return;
-        var j = 0;
+        var j = 0, xc,yc;
         ctx.clearRect(0, 0, theCanvas[0].width, theCanvas[0].height);
 
         //start drawing
@@ -165,12 +168,11 @@ $(function () {
             
             //check for new line
             if (/n/.test(recordArray[j].details)&&(recordArray[j].details !==undefined)) {
-                console.log("Test: " + (/n+/.test(recordArray[j].details)));
+                console.log("Test: " + (/n+/.test(recordArray[j+1].details)));
                 ctx.beginPath();
                 ctx.moveTo(recordArray[j].x, recordArray[j].y);
-                ctx.lineTo(recordArray[j].x+0.01, recordArray[j].y+0.01);
+                ctx.lineTo(recordArray[j].x+2, recordArray[j].y+2);
                 
-
                 //check for brush size change
                 if (/b/.test(recordArray[j].details)) {
                     ctx.lineWidth = recordArray[j].details.substr(recordArray[j].details.indexOf("b") + 1, 2);
@@ -178,16 +180,34 @@ $(function () {
                     $("#slider").val(brushSize);
                     $("#brushSizeSpan")[0].innerHTML = brushSize;
                 }
-                
-            }
-            else {
-                ctx.lineTo(recordArray[j].x, recordArray[j].y);
-                console.log(recordArray[j].x + "  " + recordArray[j].y + "   " + recordArray[j].details);
-                ctx.stroke();
+
+            } else {
+                if 
+                  (Math.sqrt(
+                        Math.pow(recordArray[j - 1].x - recordArray[j].x,2)+
+                        Math.pow(recordArray[j - 1].y - recordArray[j].y,2)
+                        )>5){                                                   // <- minimum distance to do the quadraticCurve
+                    xc = (recordArray[j-1].x + recordArray[j].x) / 2;
+                    yc = (recordArray[j-1].y + recordArray[j].y) / 2;
+                    //ctx.lineTo(recordArray[j].x, recordArray[j].y);
+                    ctx.quadraticCurveTo(recordArray[j-1].x, recordArray[j-1].y, xc, yc);
+                    console.log(recordArray[j].x + "  " + recordArray[j].y + "   " + recordArray[j].details);
+                    //ctx.strokeStyle = "darkblue";
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(xc, yc);
+                } else {
+                    ctx.lineTo(recordArray[j - 1].x, recordArray[j - 1].y);
+                    //ctx.strokeStyle = "black";
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(recordArray[j-1].x, recordArray[j-1].y);
+                }
             }
             j++;
-        }, 10);
+        }, recordingInterval);  //end start drwawing
 
-    }
+    }// end replay
 
 });
