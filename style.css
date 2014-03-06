@@ -4,71 +4,126 @@
     padding:0;
     display:block;
     font-family:sans-serif;
-    font-size:10pt;
+    font-size:14pt;
+}
+
+body, html {
+    /*height:100%;*/
+}
+
+#mainDiv {
+    width:1000px;
+    height: 600px;
+    border:1px solid black;
+    margin:0 auto;
 }
 
 #theCanvas {
+    
     width:800px;
-    height:400px;
-    margin:0 auto;
+    height:600px;
+    /*margin:0 auto;*/
+    font-size:0;
+    float:left;
 }
 
 #menu {
     width:200px;
-    margin:5px auto;
-    background-color:#0094ff;
-    padding:15px 10px 10px 10px;
+    height:100%;
     color:white;
+    float:left;
+
+    background-color:#0094ff;
+
+}
+
+
+
+#header {
+    text-align:center;
+    padding: 20px 0;
+    font-size:12pt;
+    font-weight:bold;
+    border-bottom:1px solid #3aacff;
+
+    background-color:#0094ff;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#0071c2), to(#0094ff));
+    background: -webkit-linear-gradient(top, #0071c2, #0094ff);
+    background: -moz-linear-gradient(top, #0071c2, #0094ff);
+    background: -ms-linear-gradient(top, #0071c2, #0094ff);
+    background: -o-linear-gradient(top, #0071c2, #0094ff); 
+    
 }
 
 #brushSize {
-    height:38px;
-    margin-bottom:20px;
+    height:100px;
+    padding:10px;
+    border-bottom:1px solid #3aacff;
+    /*margin-bottom:20px;*/
 }
 
     #brushSize > * {
         float:left;
-        margin:0 2px;
+        /*margin:0 2px;*/
         cursor:default;
     }
 
     #brushSize > label {
-        width:84px;
+        width:120px;
     }
 
     #brushSize > span {
-        width:40px;
+        width:60px;
+    }
+
+    
+    #slider {
+        width:88%;
+        margin:30px 5px 20px 10px;
+    }
+
+
+#colors {
+    height:190px;
+    padding:6px;
+    border-bottom:1px solid #3aacff;
+    /*margin-bottom:20px;*/
+}
+
+
+    #colors>div {
+        margin:4px;
+        height:50px;
+        width:50px;
+        float:left;
+        border:2px solid #0094ff;
+        outline:2px solid #0094ff;
+    }
+
+    #colors > div:hover {
+        outline:2px solid #6bc1ff;
+    }
+
+    #colors > div.active {
+        outline:2px solid white;
     }
 
     .button {
+        width:180px;
+        height:50px;
         text-align:center;
         background-color:#007fdb;
-        display:table-cell;
-        padding:0 5px;
-        line-height:14pt;
+        padding-top:25px;
+        margin:20px 10px;
         cursor:default;
-        min-width:18px;
 
         -webkit-user-select: none; /* Chrome/Safari */        
         -moz-user-select: none; /* Firefox */
         -ms-user-select: none; /* IE10+ */
-
-        /* Rules below not implemented in browsers yet */
         -o-user-select: none;
         user-select: none;
     }
 
-        .button:hover {
-            background-color:#3aacff;
-        }
-
-#replayBut, #resetBut {
-    margin:0 auto;
-    display:block;
-    margin-bottom:8px;
-}
-
-#slider {
-    width:80%;
-    margin:10px 10px 10px 20px;
-}
+    .button:hover {
+        background-color:#3aacff;
+    }
