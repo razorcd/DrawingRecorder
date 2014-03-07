@@ -27,7 +27,15 @@ $(function () {
     ctx.lineCap = "round";
 
     var mouse = { x: 0, y: 0 , details: "" };
-    var recordArray = [], i=0;
+    var recordObj = {
+        name: "unnamed",
+        type: "recordObj",
+        recordArray: []
+    };
+    var maxLocalSaves = 0;
+    resetSavesTable();
+
+    var i=0;
     var interval, playing = false, drawing = false;;
 
     var brushSize = 10;   //initial size of the brush
@@ -139,8 +147,43 @@ $(function () {
         replay();
     });
 
+
+    $("#localSaveBut").first().click(function () {
+        localStorage.setItem(recordObj.name, JSON.stringify(recordObj));
+
+        //alert(localStorage.getItem("unnamed"));
+        resetSavesTable();
+
+    });
+
+    function resetSavesTable() {
+        maxLocalSaves = 0;
+        $("#savesList")[0].innerHTML = "Local Saves: <br />";
+        for (var o in localStorage) {
+
+            if (JSON.parse(localStorage[o])["type"] === "recordObj") {
+                $("#savesList")[0].innerHTML += "<button class='saves'>" + JSON.parse(localStorage[o])["name"] + "</button> ";
+                maxLocalSaves += 1;
+            }
+        }
+        recordObj.name = "unnamed" + (maxLocalSaves + 1);
+
+
+        $(".saves").click(function () {
+            //console.log(JSON.parse(localStorage[($(this).text())]));
+            //console.log(recordObj);
+            recordObj = JSON.parse(localStorage[($(this).text())]);
+            i = recordObj.recordArray.length;
+            replay();
+        });
+
+
+    }
+
+    
+
     $("#resetBut").first().click(function () {
-        recordArray.length = 0; i = 0;
+        recordObj.recordArray.length = 0; i = 0;
         clearInterval(interval);
         drawing = false;
         playing = false;
@@ -176,26 +219,26 @@ $(function () {
     //drawing - line (used on mousemove)
     function draw() {
         //var xc, yc;
-          //  xc = (recordArray[i-1].x + mouse.x) / 2;
-            //yc = (recordArray[i-1].y + mouse.y) / 2;
-            ctx.lineTo(recordArray[i-1].x, recordArray[i-1].y);
-            //ctx.quadraticCurveTo(recordArray[i-1].x, recordArray[i-1].y, xc, yc);
+          //  xc = (recordObj.recordArray[i-1].x + mouse.x) / 2;
+            //yc = (recordObj.recordArray[i-1].y + mouse.y) / 2;
+            ctx.lineTo(recordObj.recordArray[i-1].x, recordObj.recordArray[i-1].y);
+            //ctx.quadraticCurveTo(recordObj.recordArray[i-1].x, recordObj.recordArray[i-1].y, xc, yc);
             
             ctx.stroke();
             ctx.beginPath();
-            ctx.moveTo(recordArray[i - 1].x, recordArray[i - 1].y);
+            ctx.moveTo(recordObj.recordArray[i - 1].x, recordObj.recordArray[i - 1].y);
             //clearTimeout(interval);
     }
 
 
     //recording mousedown
     function record(active, newlineDetails) {
-        recordArray[i] = mouse.constructor();
-        recordArray[i].x = mouse.x;
-        recordArray[i].y = mouse.y;
-        recordArray[i].details = newlineDetails;
+        recordObj.recordArray[i] = mouse.constructor();
+        recordObj.recordArray[i].x = mouse.x;
+        recordObj.recordArray[i].y = mouse.y;
+        recordObj.recordArray[i].details = newlineDetails;
         tempDetails = "";
-        console.log("REC" + recordArray[i].x + "  " + recordArray[i].y + "  " + recordArray[i].details);
+        console.log("REC" + recordObj.recordArray[i].x + "  " + recordObj.recordArray[i].y + "  " + recordObj.recordArray[i].details);
         i++;
     }
 
@@ -210,29 +253,29 @@ $(function () {
         //start drawing
         interval = setInterval(function () {
             //check if end of drawing array
-            if (j === recordArray.length - 1) {
+            if (j === recordObj.recordArray.length - 1) {
                 clearInterval(interval);
                 playing = false;
             }
             
             //check for new line
-            if (/n/.test(recordArray[j].details) && (recordArray[j].details !== undefined)) {
+            if (/n/.test(recordObj.recordArray[j].details) && (recordObj.recordArray[j].details !== undefined)) {
                 
-                console.log("Test: " + (/n+/.test(recordArray[j+1].details)));
+                console.log("Test: " + (/n+/.test(recordObj.recordArray[j+1].details)));
                 ctx.beginPath();
-                ctx.arc(recordArray[j].x, recordArray[j].y, 0.01, 0, 2 * Math.PI, false);
-                //if (/n/.test(recordArray[j + 1].details)) ctx.arc(recordArray[j].x, recordArray[j].y, 0.01, 0, 2 * Math.PI, false);
-                //else ctx.moveTo(recordArray[j].x, recordArray[j].y);
-                //ctx.lineTo(recordArray[j].x+2, recordArray[j].y+2);
+                ctx.arc(recordObj.recordArray[j].x, recordObj.recordArray[j].y, 0.01, 0, 2 * Math.PI, false);
+                //if (/n/.test(recordObj.recordArray[j + 1].details)) ctx.arc(recordObj.recordArray[j].x, recordObj.recordArray[j].y, 0.01, 0, 2 * Math.PI, false);
+                //else ctx.moveTo(recordObj.recordArray[j].x, recordObj.recordArray[j].y);
+                //ctx.lineTo(recordObj.recordArray[j].x+2, recordObj.recordArray[j].y+2);
                 
                 //check for color change
-                if (/c/.test(recordArray[j].details)){
-                    currentColor = recordArray[j].details.split("c[")[1].split("]")[0];
+                if (/c/.test(recordObj.recordArray[j].details)){
+                    currentColor = recordObj.recordArray[j].details.split("c[")[1].split("]")[0];
                     ctx.strokeStyle = currentColor;
                 }
                 //check for brush size change
-                if (/b/.test(recordArray[j].details)) {
-                    ctx.lineWidth = recordArray[j].details.substr(recordArray[j].details.indexOf("b") + 1, 2);
+                if (/b/.test(recordObj.recordArray[j].details)) {
+                    ctx.lineWidth = recordObj.recordArray[j].details.substr(recordObj.recordArray[j].details.indexOf("b") + 1, 2);
                     brushSize = ctx.lineWidth;
                     $("#slider").val(brushSize);
                     $("#brushSizeSpan")[0].innerHTML = brushSize;
@@ -242,26 +285,26 @@ $(function () {
             } else {
                 if 
                   (Math.sqrt(
-                        Math.pow(recordArray[j - 1].x - recordArray[j].x,2)+
-                        Math.pow(recordArray[j - 1].y - recordArray[j].y,2)
+                        Math.pow(recordObj.recordArray[j - 1].x - recordObj.recordArray[j].x,2)+
+                        Math.pow(recordObj.recordArray[j - 1].y - recordObj.recordArray[j].y,2)
                         ) > 10) {                                                     // <- minimum distance to do the quadraticCurve
                     //draw curve for long distances
-                    xc = (recordArray[j-1].x + recordArray[j].x) / 2;
-                    yc = (recordArray[j-1].y + recordArray[j].y) / 2;
-                    //ctx.lineTo(recordArray[j].x, recordArray[j].y);
-                    ctx.quadraticCurveTo(recordArray[j-1].x, recordArray[j-1].y, xc, yc);
-                    console.log(recordArray[j].x + "  " + recordArray[j].y + "   " + recordArray[j].details);
+                    xc = (recordObj.recordArray[j-1].x + recordObj.recordArray[j].x) / 2;
+                    yc = (recordObj.recordArray[j-1].y + recordObj.recordArray[j].y) / 2;
+                    //ctx.lineTo(recordObj.recordArray[j].x, recordObj.recordArray[j].y);
+                    ctx.quadraticCurveTo(recordObj.recordArray[j-1].x, recordObj.recordArray[j-1].y, xc, yc);
+                    console.log(recordObj.recordArray[j].x + "  " + recordObj.recordArray[j].y + "   " + recordObj.recordArray[j].details);
                     //ctx.strokeStyle = "rgb(" + "255" + "," + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + ")";
                     ctx.stroke();
 
                     ctx.beginPath();
                     ctx.moveTo(xc, yc);
                 } else {   //draw line for short distances
-                    ctx.lineTo(recordArray[j - 1].x, recordArray[j - 1].y);
+                    ctx.lineTo(recordObj.recordArray[j - 1].x, recordObj.recordArray[j - 1].y);
                     //ctx.strokeStyle = "rgb(" + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," + "255" + ")";
                     ctx.stroke();
                     ctx.beginPath();
-                    ctx.moveTo(recordArray[j-1].x, recordArray[j-1].y);
+                    ctx.moveTo(recordObj.recordArray[j-1].x, recordObj.recordArray[j-1].y);
                 }
             }
             j++;

@@ -1,4 +1,4 @@
-* {
+*:not(button) {
     border:0;
     margin:0;
     padding:0;
@@ -110,11 +110,11 @@ body, html {
 
     .button {
         width:180px;
-        height:50px;
+        height:40px;
         text-align:center;
         background-color:#007fdb;
-        padding-top:25px;
-        margin:20px 10px;
+        padding-top:18px;
+        margin:10px 10px;
         cursor:default;
 
         -webkit-user-select: none; /* Chrome/Safari */        
